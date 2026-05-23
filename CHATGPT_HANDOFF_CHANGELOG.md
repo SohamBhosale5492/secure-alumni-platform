@@ -1,3 +1,4 @@
+````md
 # ChatGPT Handoff Changelog
 
 Use this file to continue the same project in a new ChatGPT/Codex instance.
@@ -14,8 +15,9 @@ The project contains two integrated systems:
 Workspace path used in the original session:
 
 ```text
-C:\Users\Soham\Documents\Codex\2026-05-20\master-project-development-prompt-secure-alumni-2
+<LOCAL_PROJECT_PATH>
 ```
+````
 
 ## Current Status
 
@@ -61,19 +63,18 @@ alumni-platform/backend/.env
 Expected URI format:
 
 ```text
-mongodb+srv://username:password@cluster.mongodb.net/secure-alumni-platform
+mongodb+srv://<USERNAME>:<PASSWORD>@<CLUSTER>.mongodb.net/secure-alumni-platform
 ```
 
 Do not upload real secrets publicly.
 
-Update after user provided Atlas URI:
+Update after MongoDB Atlas setup:
 
-- Backend `.env` was updated with the provided Atlas credentials.
+- Backend `.env` was updated with Atlas credentials.
 - The original `mongodb+srv://` format failed in Node with SRV lookup refusal in this environment.
 - The `.env` was switched to an equivalent direct shard connection string.
-- Direct Atlas connection then failed because the current public IP is not whitelisted in Atlas Network Access.
-- Public IP to add in Atlas Network Access: `223.228.132.117`
-- After whitelisting that IP, rerun the MongoDB connection test and then start backend/frontend.
+- Direct Atlas connection initially failed because the current public IP was not whitelisted in Atlas Network Access.
+- After whitelisting the required IP in Atlas Network Access, rerun the MongoDB connection test and then start backend/frontend.
 
 Update after Atlas IP allowlist was fixed:
 
@@ -206,7 +207,7 @@ Database docs:
 - Reusable Express middleware:
 
 ```javascript
-app.use(createSecurityMonitor())
+app.use(createSecurityMonitor());
 ```
 
 - Request logging
@@ -217,6 +218,7 @@ app.use(createSecurityMonitor())
   - 4 failed logins: cooldown
   - 8 failed logins: CAPTCHA required
   - 12 failed logins: temporary account lock
+
 - API abuse detection
 - Temporary IP blocking
 - Injection/XSS payload detection
@@ -239,12 +241,12 @@ Current local backend env was set to:
 ```env
 PORT=5000
 NODE_ENV=development
-MONGODB_URI=mongodb://127.0.0.1:27017/secure-alumni-platform
+MONGODB_URI=<LOCAL_OR_ATLAS_MONGODB_URI>
 USE_MEMORY_DB=false
-JWT_SECRET=<local random secret already generated in .env>
+JWT_SECRET=<YOUR_LOCAL_RANDOM_SECRET>
 JWT_EXPIRES_IN=7d
 CORS_ORIGIN=http://localhost:5173
-DEMO_CAPTCHA_TOKEN=demo-pass
+DEMO_CAPTCHA_TOKEN=<DEMO_TOKEN>
 ```
 
 To continue, replace `MONGODB_URI` with the real MongoDB Atlas URI.
@@ -318,6 +320,7 @@ http://localhost:5000/health
    - create job/internship opportunity
    - open security dashboard
    - trigger failed logins to generate alerts
+
 9. If everything works locally, deploy backend to Render and frontend to Vercel.
 
 ## Deployment Notes
@@ -343,10 +346,10 @@ npm run start:backend
 NODE_ENV=production
 PORT=5000
 MONGODB_URI=<MongoDB Atlas URI>
-JWT_SECRET=<long random secret>
+JWT_SECRET=<LONG_RANDOM_SECRET>
 JWT_EXPIRES_IN=7d
-CORS_ORIGIN=<Vercel frontend URL>
-DEMO_CAPTCHA_TOKEN=<demo captcha token>
+CORS_ORIGIN=<VERCEL_FRONTEND_URL>
+DEMO_CAPTCHA_TOKEN=<DEMO_TOKEN>
 USE_MEMORY_DB=false
 ```
 
@@ -373,7 +376,7 @@ dist
 - Vercel env var:
 
 ```env
-VITE_API_URL=https://your-render-backend-url.onrender.com/api
+VITE_API_URL=https://<YOUR_RENDER_BACKEND>.onrender.com/api
 ```
 
 ## Notes and Caveats
@@ -383,3 +386,7 @@ VITE_API_URL=https://your-render-backend-url.onrender.com/api
 - `mongodb-memory-server` was added as an attempted local fallback but did not work reliably in this environment.
 - No real MongoDB Atlas secret is stored in this handoff file.
 - Do not upload `.env` files if they contain real credentials.
+
+```
+
+```
