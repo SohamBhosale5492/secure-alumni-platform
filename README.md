@@ -120,10 +120,17 @@ Set the Vercel project root to `alumni-platform/frontend`.
 Install or copy the `security-system` package into another Express app and wire it like this:
 
 ```javascript
-const { createSecurityMonitor, securityDashboardRoutes } = require("security-system");
+const {
+  createSecurityMonitor,
+  securityDashboardRoutes,
+} = require("security-system");
 
 app.use(createSecurityMonitor());
-app.use("/api/security", authenticateAdmin, securityDashboardRoutes({ userModel: User }));
+app.use(
+  "/api/security",
+  authenticateAdmin,
+  securityDashboardRoutes({ userModel: User }),
+);
 ```
 
 For authentication routes, call `recordFailedLogin`, `recordSuccessfulLogin`, and `evaluateLoginDefense` from the package to activate adaptive brute-force protection.
