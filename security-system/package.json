@@ -1,0 +1,12 @@
+{
+  "name": "security-system",
+  "version": "1.0.0",
+  "description": "Reusable Express middleware for web application security monitoring and intrusion detection.",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "axios": "^1.7.9",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "secure-alumni-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Secure alumni management platform with reusable web application security monitoring and intrusion detection.",
+  "workspaces": [
+    "alumni-platform/backend",
+    "alumni-platform/frontend",
+    "security-system"
+  ],
+  "scripts": {
+    "dev:backend": "npm --workspace alumni-backend run dev",
+    "dev:frontend": "npm --workspace alumni-frontend run dev",
+    "start:backend": "npm --workspace alumni-backend start",
+    "build:frontend": "npm --workspace alumni-frontend run build",
+    "lint:backend": "npm --workspace alumni-backend run lint",
+    "check": "npm --workspace alumni-backend run check && npm --workspace alumni-frontend run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
