@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { Save, Unlock } from "lucide-react";
+import { CalendarCheck, Save, Unlock, Users } from "lucide-react";
 import api from "../services/api";
 import EmptyState from "../components/EmptyState";
+import { useAuth } from "../context/AuthContext";
 
 function AdminPanel() {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
+  const [events, setEvents] = useState([]);
   const [overview, setOverview] = useState(null);
   const [announcement, setAnnouncement] = useState({
     title: "",
@@ -13,13 +16,15 @@ function AdminPanel() {
   });
 
   async function load() {
-    const [usersResponse, overviewResponse] = await Promise.all([
+    const [usersResponse, overviewResponse, eventsResponse] = await Promise.all([
       api.get("/admin/users"),
-      api.get("/admin/overview")
+      api.get("/admin/overview"),
+      api.get("/events")
     ]);
 
     setUsers(usersResponse.data);
     setOverview(overviewResponse.data);
+    setEvents(eventsResponse.data);
   }
 
   useEffect(() => {
@@ -92,6 +97,64 @@ function AdminPanel() {
 
       <section className="panel">
         <div className="panel-heading">
+          <h2>Event Registrations</h2>
+        </div>
+        <div className="table-responsive">
+          <table className="table align-middle">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Date</th>
+                <th>Registered</th>
+                <th>Students / Alumni</th>
+              </tr>
+            </thead>
+            <tbody>
+              {events.map((event) => {
+                const attendees = Array.isArray(event.attendees) ? event.attendees : [];
+
+                return (
+                  <tr key={event._id}>
+                    <td>
+                      <div className="d-flex align-items-center gap-2">
+                        <CalendarCheck size={16} />
+                        <strong>{event.title}</strong>
+                      </div>
+                    </td>
+                    <td>{new Date(event.date).toLocaleString()}</td>
+                    <td>
+                      <span className="status-badge">
+                        <Users size={14} />
+                        {event.attendeeCount ?? attendees.length}
+                      </span>
+                    </td>
+                    <td>
+                      {attendees.length ? (
+                        <div className="registration-chips">
+                          {attendees.map((attendee) => (
+                            <span key={attendee._id}>
+                              {attendee.username}
+                              <small>
+                                {attendee.email} - {attendee.role}
+                              </small>
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="muted-text">No registrations yet</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {!events.length && <EmptyState title="No event registrations yet." />}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="panel-heading">
           <h2>User Management</h2>
         </div>
         <div className="table-responsive">
@@ -107,15 +170,24 @@ function AdminPanel() {
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
+              {users.map((user) => {
+                const isCurrentAdmin = user._id === currentUser?.id;
+
+                return (
                 <tr key={user._id}>
-                  <td>{user.username}</td>
+                  <td>
+                    <div className="d-flex align-items-center gap-2">
+                      <span>{user.username}</span>
+                      {isCurrentAdmin && <span className="status-badge">Current admin</span>}
+                    </div>
+                  </td>
                   <td>{user.email}</td>
                   <td>
                     <select
                       className="form-select form-select-sm"
                       value={user.role}
                       onChange={(event) => updateUser(user._id, { role: event.target.value })}
+                      disabled={isCurrentAdmin}
                     >
                       <option value="student">Student</option>
                       <option value="alumni">Alumni</option>
@@ -127,6 +199,7 @@ function AdminPanel() {
                       className="form-select form-select-sm"
                       value={user.status}
                       onChange={(event) => updateUser(user._id, { status: event.target.value })}
+                      disabled={isCurrentAdmin}
                     >
                       <option value="active">Active</option>
                       <option value="pending">Pending</option>
@@ -143,13 +216,20 @@ function AdminPanel() {
                       className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2"
                       type="button"
                       onClick={() => unblockUser(user._id)}
+                      disabled={isCurrentAdmin}
+                      title={
+                        isCurrentAdmin
+                          ? "You cannot block or reset your own admin account."
+                          : "Reset user security restrictions"
+                      }
                     >
                       <Unlock size={14} />
                       Reset
                     </button>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
           {!users.length && <EmptyState title="No users found." />}

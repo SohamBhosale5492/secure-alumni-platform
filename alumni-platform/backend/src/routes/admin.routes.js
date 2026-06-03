@@ -77,6 +77,18 @@ router.patch(
   validateRequest,
   async (req, res, next) => {
     try {
+      const isSelfUpdate = String(req.params.id) === String(req.user._id);
+
+      if (
+        isSelfUpdate &&
+        ((req.body.role && req.body.role !== "admin") ||
+          (req.body.status && req.body.status !== "active"))
+      ) {
+        return res.status(400).json({
+          message: "Admins cannot remove their own admin access or block their own account."
+        });
+      }
+
       const allowedFields = ["role", "status", "threatScore"];
       const updates = {};
 
