@@ -85,6 +85,18 @@ app.use(
   securityDashboardRoutes({ userModel: User })
 );
 
+const frontendPath = path.join(__dirname, "../../frontend-dist");
+
+app.use(express.static(frontendPath));
+
+app.get("*", (req, res, next) => {
+  if (req.path.startsWith("/api/") || req.path === "/health") {
+    return next();
+  }
+
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
+
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
