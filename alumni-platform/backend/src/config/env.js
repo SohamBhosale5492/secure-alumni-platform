@@ -15,4 +15,9 @@ const env = {
   demoCaptchaToken: process.env.DEMO_CAPTCHA_TOKEN || "demo-pass"
 };
 
+if (env.nodeEnv === "production" && !env.mongoUri) {
+  console.error("MONGODB_URI is required in production.");
+  process.exit(1);
+}
+
 module.exports = env;

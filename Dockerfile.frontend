@@ -1,0 +1,30 @@
+# Build stage
+FROM node:20 AS build
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+COPY alumni-platform/backend/package.json ./alumni-platform/backend/package.json
+COPY alumni-platform/frontend/package.json ./alumni-platform/frontend/package.json
+COPY security-system/package.json ./security-system/package.json
+
+RUN npm ci
+
+COPY alumni-platform/frontend ./alumni-platform/frontend
+
+WORKDIR /app/alumni-platform/frontend
+
+ENV VITE_API_URL=http://localhost:5000/api
+
+RUN npm run build
+
+
+# Production stage
+FROM nginx:alpine
+
+COPY --from=build /app/alumni-platform/frontend/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
