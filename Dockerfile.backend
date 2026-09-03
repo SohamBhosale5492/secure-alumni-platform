@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:20-slim
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ COPY alumni-platform/backend/package.json ./alumni-platform/backend/package.json
 COPY alumni-platform/frontend/package.json ./alumni-platform/frontend/package.json
 COPY security-system/package.json ./security-system/package.json
 
-RUN npm ci
+RUN npm ci --omit=dev
 
 COPY alumni-platform/backend ./alumni-platform/backend
 COPY security-system ./security-system
