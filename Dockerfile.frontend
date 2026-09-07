@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20 AS build
+FROM node:20-slim AS build
 
 WORKDIR /app
 
@@ -15,8 +15,6 @@ COPY alumni-platform/frontend ./alumni-platform/frontend
 
 WORKDIR /app/alumni-platform/frontend
 
-ENV VITE_API_URL=http://localhost:5000/api
-
 RUN npm run build
 
 
@@ -24,6 +22,8 @@ RUN npm run build
 FROM nginx:alpine
 
 COPY --from=build /app/alumni-platform/frontend/dist /usr/share/nginx/html
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
